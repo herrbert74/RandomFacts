@@ -1,84 +1,154 @@
+@file:Suppress("UnstableApiUsage")
+
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.kotlin)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.google.dagger.hilt.android)
+    alias(libs.plugins.realm)
 }
 
 android {
     namespace = "com.pelagohealth.codingchallenge"
-    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.pelagohealth.codingchallenge"
-        minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
+        versionCode = libs.versions.versionCode.get().toInt()
+        versionName = libs.versions.versionName.toString()
+        vectorDrawables.useSupportLibrary = true
+        minSdk = libs.versions.minSdkVersion.get().toInt()
+        compileSdk = libs.versions.compileSdkVersion.get().toInt()
+        targetSdk = libs.versions.targetSdkVersion.get().toInt()
+        testInstrumentationRunner = "com.pelagohealth.codingchallenge.PelagoAndroidJUnitRunner"
     }
 
     buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+
+        getByName("release") {
+            isDebuggable = false
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
+
+        getByName("debug") {
+            isMinifyEnabled = false
+        }
+
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
+
     buildFeatures {
+        buildConfig = true
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
+
+    //Needed for Mockk
+    testOptions { packaging { jniLibs { useLegacyPackaging = true } } }
+
     packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
+        resources.excludes.add("MANIFEST.MF")
+        resources.excludes.add("META-INF/LICENSE")
+        resources.excludes.add("META-INF/LICENSE.txt")
+        resources.excludes.add("META-INF/LICENSE.md")
+        resources.excludes.add("META-INF/LICENSE-notice.md")
+        resources.excludes.add("META-INF/MANIFEST.MF")
+        resources.excludes.add("META-INF/NOTICE.txt")
+        resources.excludes.add("META-INF/rxjava.properties")
+        resources.excludes.add("jsr305_annotations/Jsr305_annotations.gwt.xml")
     }
+
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.13.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-    implementation("androidx.activity:activity-ktx:1.9.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.text)
+    implementation(libs.androidx.compose.ui.unit)
+    implementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.compose.ui.toolingPreview)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.coreKtx)
+    implementation(libs.androidx.constraintLayout)
+    implementation(libs.androidx.navigation.uiKtx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.google.material)
+    implementation(libs.androidx.coreKtx)
+    implementation(libs.kotlinResult.result)
+    implementation(libs.kotlinResult.coroutines)
+    implementation(libs.kotlin.parcelize.runtime)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.squareUp.okhttp3.loggingInterceptor)
+    implementation(libs.squareUp.moshi.core)
+    implementation(libs.squareUp.moshi.kotlin)
+    implementation(libs.timber)
+    implementation(libs.realm.base)
 
-    // Compose
-    implementation("androidx.activity:activity-compose:1.9.0")
-    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
+    implementation(libs.google.gson)
+    implementation(libs.squareUp.retrofit2.retrofit)
+    implementation(libs.squareUp.retrofit2.converterMoshi)
 
-    // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-moshi:2.11.0")
-    implementation("com.squareup.moshi:moshi:1.15.0")
+    androidTestImplementation(libs.squareUp.okhttp3.loggingInterceptor)
 
-    // Hilt
-    implementation("com.google.dagger:hilt-android:2.45")
+    implementation(libs.google.dagger.core)
+    add("ksp", libs.google.dagger.compiler)
+    kspTest(libs.google.dagger.compiler)
+    kspAndroidTest(libs.google.dagger.compiler)
 
-    // Unit testing
-    testImplementation("junit:junit:4.13.2")
+    implementation(libs.google.dagger.hilt.android)
+    add("ksp", libs.androidx.hilt.compiler)
+    kspTest(libs.androidx.hilt.compiler)
+    add("ksp", libs.google.dagger.hilt.androidCompiler)
+    kspTest(libs.google.dagger.hilt.androidCompiler)
+    kspAndroidTest(libs.google.dagger.hilt.androidCompiler)
 
-    // UI testing
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    implementation(libs.coil)
 
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation(libs.inject)
+
+    testImplementation(libs.androidx.test.coreKtx)
+    testImplementation(libs.androidx.test.ext.jUnit)
+    testImplementation(libs.test.mockk.core)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.test.kotest.assertions.core)
+
+    debugRuntimeOnly(platform(libs.androidx.compose.bom))
+    //Needed for createComposeRule, NOT ONLY for createAndroidComposeRule, as in the docs
+    debugRuntimeOnly(libs.androidx.compose.ui.testManifest)
+
+    androidTestImplementation(libs.test.mockk.android)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.androidx.test.ext.jUnit)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.compose.ui.test.android)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4.android)
+    androidTestImplementation(libs.google.gson)
+    androidTestImplementation(libs.google.dagger.hilt.androidTesting)
+    androidTestImplementation(libs.squareUp.retrofit2.retrofit)
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions.freeCompilerArgs.add("-opt-in=androidx.compose.material3.ExperimentalMaterial3Api")
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions.freeCompilerArgs.add("-opt-in=androidx.compose.ui.test.ExperimentalTestApi")
 }
