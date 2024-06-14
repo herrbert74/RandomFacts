@@ -9,12 +9,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import com.pelagohealth.codingchallenge.presentation.theme.Dimens
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun SwipeableText(
@@ -23,6 +27,11 @@ fun SwipeableText(
 ) {
     var offsetX by remember { mutableFloatStateOf(0f) }
 
+    val composableScope = rememberCoroutineScope()
+
+    var job: Job? = null
+    var jumpBackJob: Job? = null
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -30,7 +39,6 @@ fun SwipeableText(
     ) {
         Box(
             modifier = Modifier
-                //.padding(top = Dimens.marginLarge)
                 .graphicsLayer {
                     this.translationX = offsetX
                 }
@@ -40,7 +48,19 @@ fun SwipeableText(
                         change.consume()
                         offsetX += dragAmount.x
                         if (offsetX > 150) {
-                            onSwipe(text)
+                            jumpBackJob?.cancel()
+                            job = composableScope.launch {
+                                delay(150L)
+                                job?.cancel()
+                                onSwipe(text)
+                            }
+                        } else {
+                            jumpBackJob?.cancel()
+                            job?.cancel()
+                            jumpBackJob = composableScope.launch {
+                                delay(200L)
+                                offsetX = 0f
+                            }
                         }
                     }
                 }

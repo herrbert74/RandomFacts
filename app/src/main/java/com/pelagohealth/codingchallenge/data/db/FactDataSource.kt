@@ -11,7 +11,7 @@ interface FactDataSource {
 
     suspend fun deleteFact(text: String)
 
-    fun getFacts(): Flow<List<Fact>?>
+    fun getFacts(): Flow<List<Fact>>
 
     fun getFact(id: Int): Fact
 

@@ -9,6 +9,7 @@ import com.pelagohealth.codingchallenge.domain.api.FactRepository
 import com.pelagohealth.codingchallenge.domain.model.Fact
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
 class FactAccessor(
@@ -26,25 +27,19 @@ class FactAccessor(
         }
     }
 
-    override suspend fun getFacts(): Flow<List<Fact>?> {
-        return withContext(ioContext) {
-            factDataSource.getFacts()
-        }
+    override fun getFacts(): Flow<List<Fact>> {
+        return factDataSource.getFacts().flowOn(ioContext)
     }
 
     override suspend fun deleteFact(text: String) {
-        apiRunCatching {
-            withContext(ioContext) {
-                factDataSource.deleteFact(text)
-            }
+        withContext(ioContext) {
+            factDataSource.deleteFact(text)
         }
     }
 
     override suspend fun deleteAll() {
-        apiRunCatching {
-            withContext(ioContext) {
-                factDataSource.purgeDatabase()
-            }
+        withContext(ioContext) {
+            factDataSource.purgeDatabase()
         }
     }
 

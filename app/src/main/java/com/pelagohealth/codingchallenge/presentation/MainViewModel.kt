@@ -57,8 +57,8 @@ class MainViewModel @Inject constructor(private val factRepository: FactReposito
                     state.copy(
                         isLoading = false,
                         error = null,
-                        fact = facts?.lastOrNull(),
-                        previousFacts = facts?.dropLast(1).orEmpty().reversed()
+                        fact = facts.lastOrNull(),
+                        previousFacts = facts.dropLast(1).reversed()
                     )
                 }
             }

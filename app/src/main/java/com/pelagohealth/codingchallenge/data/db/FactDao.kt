@@ -36,10 +36,10 @@ class FactDao @Inject constructor(private val realm: Realm) : FactDataSource {
         }
     }
 
-    override fun getFacts(): Flow<List<Fact>?> {
+    override fun getFacts(): Flow<List<Fact>> {
         return realm.query(FactDbo::class).asFlow()
             .map { dbo ->
-                dbo.list.map { it.toFact() }.takeIf { it.isNotEmpty() }
+                dbo.list.map { it.toFact() }.takeIf { it.isNotEmpty() }.orEmpty()
             }
     }
 

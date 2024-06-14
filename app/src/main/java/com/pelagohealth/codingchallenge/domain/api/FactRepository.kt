@@ -8,7 +8,7 @@ interface FactRepository {
 
     suspend fun get():  ApiResult<Unit>
 
-    suspend fun getFacts(): Flow<List<Fact>?>
+     fun getFacts(): Flow<List<Fact>>
 
     suspend fun deleteFact(text:String)
 
