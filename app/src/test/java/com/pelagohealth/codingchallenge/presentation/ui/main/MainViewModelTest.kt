@@ -1,5 +1,6 @@
 package com.pelagohealth.codingchallenge.presentation.ui.main
 
+import com.github.michaelbull.result.Ok
 import com.pelagohealth.codingchallenge.common.testhelper.FactMother
 import com.pelagohealth.codingchallenge.domain.api.FactRepository
 import com.pelagohealth.codingchallenge.domain.model.Fact
@@ -27,7 +28,7 @@ class MainViewModelTest {
 
     private lateinit var mainViewModel: MainViewModel
 
-    private val factFlow = MutableSharedFlow<List<Fact>?>(replay = 1)
+    private val factFlow = MutableSharedFlow<List<Fact>>(replay = 1)
 
     private val dispatcher = StandardTestDispatcher()
 
@@ -35,7 +36,7 @@ class MainViewModelTest {
     fun setUp() {
 
         Dispatchers.setMain(dispatcher)
-        coEvery { factRepository.get() } answers { }
+        coEvery { factRepository.get() } returns Ok(Unit)
         coEvery { factRepository.getFacts() } answers { factFlow }
         mainViewModel = MainViewModel(factRepository)
         CoroutineScope(Dispatchers.Unconfined).launch {

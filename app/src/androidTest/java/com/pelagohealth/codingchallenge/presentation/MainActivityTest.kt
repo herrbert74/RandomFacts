@@ -71,20 +71,18 @@ class MainActivityTest {
     }
 
     @Test
-    fun showMoreFacts() {
-        runTest {
+    fun showMoreFacts() = runTest {
 
-            composeTestRule.waitUntilAtLeastOneExists(hasTestTag("FactText"), 1000L)
+        composeTestRule.waitUntilAtLeastOneExists(hasTestTag("FactText"), 1000L)
 
-            composeTestRule.onNodeWithText("More facts!", ignoreCase = true).performClick()
+        composeTestRule.onNodeWithText("More facts!", ignoreCase = true).performClick()
 
-            val factTextMatcher = hasText("This is another random fact") and hasTestTag("FactText")
-            val swipeableMatcher = hasText("This is a random fact") and hasParent(hasTestTag("Swipeable"))
+        val factTextMatcher = hasText("This is another random fact") and hasTestTag("FactText")
+        val swipeableMatcher = hasText("This is a random fact") and hasParent(hasTestTag("Swipeable"))
 
-            composeTestRule.onNode(factTextMatcher).assertExists()
-            composeTestRule.onNode(swipeableMatcher).assertExists()
+        composeTestRule.onNode(factTextMatcher).assertExists()
+        composeTestRule.onNode(swipeableMatcher).assertExists()
 
-        }
     }
 
     @Test
@@ -95,8 +93,8 @@ class MainActivityTest {
         composeTestRule.onNodeWithText("More facts!", ignoreCase = true).performClick()
 
         val swipeableMatcher = hasText("This is a random fact") and hasParent(hasTestTag("Swipeable"))
-        composeTestRule.onNode(swipeableMatcher).performTouchInput{
-            this.swipe(start = Offset(30f, 30f), end = Offset(300f, 0f), durationMillis = 20)
+        composeTestRule.onNode(swipeableMatcher).performTouchInput {
+            this.swipe(start = Offset(100f, 100f), end = Offset(600f, 30f), durationMillis = 700)
         }
 
         composeTestRule.onNode(swipeableMatcher).assertDoesNotExist()
